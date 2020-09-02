@@ -1,23 +1,14 @@
 package com.axiom.MobileDeviceSearch.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import com.axiom.MobileDeviceSearch.model.MobileDevice;
 import com.axiom.MobileDeviceSearch.model.SearchQuery;
@@ -30,19 +21,13 @@ public class MobileDeviceSearchServiceImpl implements MobileDeviceSearchService 
 	 * logger
 	 */
 	Logger logger = LoggerFactory.getLogger(MobileDeviceSearchServiceImpl.class);
-
+    
 	/**
-	 * restTemplate
+	 * client for Rest API
 	 */
 	@Autowired
-	private RestTemplate restTemplate;
-
-	/**
-	 * wsUrl
-	 */
-	@Value("${ws.url.aDefaultUrl}")
-	private String wsUrl;
-
+	private MobileDeviceSearchServiceClient client;
+	
 	/**
 	 *input searchQuery
 	 *return filteredMobileRecords
@@ -50,7 +35,8 @@ public class MobileDeviceSearchServiceImpl implements MobileDeviceSearchService 
 	@Override
 	public List<MobileDevice> searchMobileDevices(SearchQuery searchQuery) {
 		logger.info("Getting Complete list of Devices");
-		Stream<MobileDevice> mobileDeviceStream = getDevices().parallelStream();
+		List<MobileDevice> mobileDevices=client.getDevices();
+		Stream<MobileDevice> mobileDeviceStream = mobileDevices.parallelStream();
 		
 		if (!StringUtils.isEmpty(searchQuery.getSim())) {
 			logger.info("Running Filter based on getSim..{}",searchQuery.getSim());
@@ -124,21 +110,5 @@ public class MobileDeviceSearchServiceImpl implements MobileDeviceSearchService 
 		return filteredMobileRecords;
 	}
 	
-	/**
-	 * @return List<MobileDevice>
-	 */
-	private List<MobileDevice> getDevices(){
-		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
-		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
-		messageConverters.add(converter);
-		restTemplate.setMessageConverters(messageConverters);
-		logger.info("Calling Rest API to get the Mobile records.");
-		ResponseEntity<List<MobileDevice>> responseEntity = restTemplate.exchange(wsUrl, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MobileDevice>>() {
-				});
-		return  responseEntity.getBody();
-		
-	}
-
+	
 }
