@@ -1,9 +1,13 @@
 package com.axiom.MobileDeviceSearch.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * @author Awais Azeem
  *
  */
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class hardware {
 	
 	private String audioJack;

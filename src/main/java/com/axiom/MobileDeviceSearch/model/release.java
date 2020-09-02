@@ -1,5 +1,8 @@
 package com.axiom.MobileDeviceSearch.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class release {
 	
 	private String announceDate;

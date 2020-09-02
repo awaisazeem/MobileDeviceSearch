@@ -1,5 +1,8 @@
 package com.axiom.MobileDeviceSearch.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MobileDevice {
 	
 	private String id;
@@ -59,6 +62,8 @@ public class MobileDevice {
 	public void setHardware(hardware hardware) {
 		this.hardware = hardware;
 	}
+	
+	
     
     
 }
