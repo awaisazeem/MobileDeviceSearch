@@ -18,6 +18,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.axiom.MobileDeviceSearch.constants.Constants;
 import com.axiom.MobileDeviceSearch.model.MobileDevice;
 
 @Service
@@ -41,7 +42,7 @@ public class MobileDeviceSearchServiceClient {
 	/**
 	 * @return List<MobileDevice>
 	 */
-	@Cacheable("MobileDevices")
+	@Cacheable(Constants.MOBILE_DEVICE_CACHE_NAME)
 	public List<MobileDevice> getDevices(){
 		logger.info("Getting Devices from remote Server.");
 		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();

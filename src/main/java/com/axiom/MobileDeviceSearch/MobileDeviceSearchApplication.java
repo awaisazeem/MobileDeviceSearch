@@ -9,6 +9,8 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
+import com.axiom.MobileDeviceSearch.constants.Constants;
+
 
 @SpringBootApplication
 @EnableCaching
@@ -25,7 +27,7 @@ public class MobileDeviceSearchApplication {
     }
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("MobileDevices");
+        return new ConcurrentMapCacheManager(Constants.MOBILE_DEVICE_CACHE_NAME);
     }
 
 }
