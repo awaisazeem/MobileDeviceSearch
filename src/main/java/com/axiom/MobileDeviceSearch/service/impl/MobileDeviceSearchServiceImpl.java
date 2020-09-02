@@ -5,7 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -24,79 +25,104 @@ import com.axiom.MobileDeviceSearch.service.MobileDeviceSearchService;
 
 @Service
 public class MobileDeviceSearchServiceImpl implements MobileDeviceSearchService {
+	
+	/**
+	 * logger
+	 */
+	Logger logger = LoggerFactory.getLogger(MobileDeviceSearchServiceImpl.class);
 
+	/**
+	 * restTemplate
+	 */
 	@Autowired
 	private RestTemplate restTemplate;
 
+	/**
+	 * wsUrl
+	 */
 	@Value("${ws.url.aDefaultUrl}")
 	private String wsUrl;
 
+	/**
+	 *input searchQuery
+	 *return filteredMobileRecords
+	 */
 	@Override
 	public List<MobileDevice> searchMobileDevices(SearchQuery searchQuery) {
-	
+		logger.info("Getting Complete list of Devices");
 		Stream<MobileDevice> handsetDataStream = getDevices().parallelStream();
-
 		if (!StringUtils.isEmpty(searchQuery.getSim())) {
-			handsetDataStream = handsetDataStream.filter(handsetData -> {
-				if (handsetData.getSim().equalsIgnoreCase(searchQuery.getSim())) {
-					return true;
-				}
-
-				return false;
-			});
+			logger.info("Running Filter based on getSim..{}",searchQuery.getSim());
+			handsetDataStream = handsetDataStream.filter(
+					handsetData -> handsetData.getSim().equalsIgnoreCase(searchQuery.getSim()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getAnnounceDate())) {
+			logger.info("Running Filter based on getAnnounceDate..{}",searchQuery.getAnnounceDate());
 			handsetDataStream = handsetDataStream.filter(
 					handsetData -> handsetData.getRelease().getAnnounceDate().equalsIgnoreCase(searchQuery.getAnnounceDate()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getPriceEur())) {
+			logger.info("Running Filter based on getPriceEur..{}",searchQuery.getPriceEur());
 			handsetDataStream = handsetDataStream.filter(
 					handsetData -> handsetData.getRelease().getPriceEur().equalsIgnoreCase(searchQuery.getPriceEur()));
 		}
 
 		if (!StringUtils.isEmpty(searchQuery.getId())) {
+			logger.info("Running Filter based on getId..{}",searchQuery.getId());
 			handsetDataStream = handsetDataStream
 					.filter(handsetData -> handsetData.getId().equalsIgnoreCase(searchQuery.getId()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getAudioJack())) {
+			logger.info("Running Filter based on getAudioJack..{}",searchQuery.getAudioJack());
 			handsetDataStream = handsetDataStream
 					.filter(handsetData -> handsetData.getHardware().getAudioJack().equalsIgnoreCase(searchQuery.getAudioJack()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getBattery())) {
+			logger.info("Running Filter based on getBattery..{}",searchQuery.getBattery());
 			handsetDataStream = handsetDataStream
 					.filter(handsetData -> handsetData.getHardware().getBattery().equalsIgnoreCase(searchQuery.getBattery()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getGps())) {
+			logger.info("Running Filter based on getGps..{}",searchQuery.getGps());
 			handsetDataStream = handsetDataStream
 					.filter(handsetData -> handsetData.getHardware().getGps().equalsIgnoreCase(searchQuery.getGps()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getBrand())) {
+			logger.info("Running Filter based on getBrand..{}",searchQuery.getBrand());
 			handsetDataStream = handsetDataStream
 					.filter(handsetData -> handsetData.getBrand().equalsIgnoreCase(searchQuery.getBrand()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getPhone())) {
+			logger.info("Running Filter based on getPhone..{}",searchQuery.getPhone());
 			handsetDataStream = handsetDataStream
 					.filter(handsetData -> handsetData.getPhone().equalsIgnoreCase(searchQuery.getPhone()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getPicture())) {
+			logger.info("Running Filter based on getPicture..{}",searchQuery.getPicture());
 			handsetDataStream = handsetDataStream
 					.filter(handsetData -> handsetData.getPicture().equalsIgnoreCase(searchQuery.getPicture()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getResolution())) {
+			logger.info("Running Filter based on getResolution..{}",searchQuery.getResolution());
 			handsetDataStream = handsetDataStream
 					.filter(handsetData -> handsetData.getResolution().equals(searchQuery.getResolution()));
 		}
-		List<MobileDevice> filteredRecords = handsetDataStream.collect(Collectors.toList());
+		List<MobileDevice> filteredMobileRecords = handsetDataStream.collect(Collectors.toList());
+		logger.info("Filter Completed Successfully");
 
-		return filteredRecords;
+		return filteredMobileRecords;
 	}
 	
+	/**
+	 * @return List<MobileDevice>
+	 */
 	private List<MobileDevice> getDevices(){
 		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
 		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
 		converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
 		messageConverters.add(converter);
 		restTemplate.setMessageConverters(messageConverters);
+		logger.info("Calling Rest API to get the Mobile records.");
 		ResponseEntity<List<MobileDevice>> responseEntity = restTemplate.exchange(wsUrl, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MobileDevice>>() {
 				});

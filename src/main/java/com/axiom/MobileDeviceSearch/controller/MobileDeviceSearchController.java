@@ -2,6 +2,8 @@ package com.axiom.MobileDeviceSearch.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,8 @@ import com.axiom.MobileDeviceSearch.service.MobileDeviceSearchService;
 @RequestMapping("/mobile")
 public class MobileDeviceSearchController {
 	
+	Logger logger = LoggerFactory.getLogger(MobileDeviceSearchController.class);
+	
 	@Autowired
 	private MobileDeviceSearchService mobileDeviceSearch;
 	
@@ -27,6 +31,9 @@ public class MobileDeviceSearchController {
 			@RequestParam(name="sim",required = false) String sim,@RequestParam(name="resolution",required = false) String resolution,
 			@RequestParam(name="audioJack",required = false) String audioJack,@RequestParam(name="gps",required = false) String gps,
 			@RequestParam(name="battery",required = false) String battery) {
+		
+		logger.info("##Application Start..## ");
+		logger.info("##Populating the Search Criteria with query params##");
 		SearchQuery seacrhQuery = new SearchQuery();
 		seacrhQuery.setId(id);
 		seacrhQuery.setAudioJack(audioJack);
@@ -39,6 +46,7 @@ public class MobileDeviceSearchController {
 		seacrhQuery.setAnnounceDate(announceDate);
 		seacrhQuery.setResolution(resolution);
 		seacrhQuery.setSim(sim);
+		logger.info("Query Params {}", seacrhQuery.toString());
 		return mobileDeviceSearch.searchMobileDevices(seacrhQuery);
 		
 		
