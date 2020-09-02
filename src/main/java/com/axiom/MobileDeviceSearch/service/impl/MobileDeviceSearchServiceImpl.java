@@ -50,64 +50,75 @@ public class MobileDeviceSearchServiceImpl implements MobileDeviceSearchService 
 	@Override
 	public List<MobileDevice> searchMobileDevices(SearchQuery searchQuery) {
 		logger.info("Getting Complete list of Devices");
-		Stream<MobileDevice> handsetDataStream = getDevices().parallelStream();
+		Stream<MobileDevice> mobileDeviceStream = getDevices().parallelStream();
+		
 		if (!StringUtils.isEmpty(searchQuery.getSim())) {
 			logger.info("Running Filter based on getSim..{}",searchQuery.getSim());
-			handsetDataStream = handsetDataStream.filter(
-					handsetData -> handsetData.getSim().equalsIgnoreCase(searchQuery.getSim()));
+			mobileDeviceStream = mobileDeviceStream.filter(handsetData -> {
+				String sims[] = handsetData.getSim().split(" ");
+				for (String s : sims) {
+					if (s.equalsIgnoreCase(searchQuery.getSim())) {
+						return true;
+					}
+				}
+				return false;
+			});
 		}
+		
 		if (!StringUtils.isEmpty(searchQuery.getAnnounceDate())) {
 			logger.info("Running Filter based on getAnnounceDate..{}",searchQuery.getAnnounceDate());
-			handsetDataStream = handsetDataStream.filter(
+			mobileDeviceStream = mobileDeviceStream.filter(
 					handsetData -> handsetData.getRelease().getAnnounceDate().equalsIgnoreCase(searchQuery.getAnnounceDate()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getPriceEur())) {
 			logger.info("Running Filter based on getPriceEur..{}",searchQuery.getPriceEur());
-			handsetDataStream = handsetDataStream.filter(
+			mobileDeviceStream = mobileDeviceStream.filter(
 					handsetData -> handsetData.getRelease().getPriceEur().equalsIgnoreCase(searchQuery.getPriceEur()));
 		}
 
 		if (!StringUtils.isEmpty(searchQuery.getId())) {
 			logger.info("Running Filter based on getId..{}",searchQuery.getId());
-			handsetDataStream = handsetDataStream
+			mobileDeviceStream = mobileDeviceStream
 					.filter(handsetData -> handsetData.getId().equalsIgnoreCase(searchQuery.getId()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getAudioJack())) {
 			logger.info("Running Filter based on getAudioJack..{}",searchQuery.getAudioJack());
-			handsetDataStream = handsetDataStream
+			mobileDeviceStream = mobileDeviceStream
 					.filter(handsetData -> handsetData.getHardware().getAudioJack().equalsIgnoreCase(searchQuery.getAudioJack()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getBattery())) {
 			logger.info("Running Filter based on getBattery..{}",searchQuery.getBattery());
-			handsetDataStream = handsetDataStream
+			mobileDeviceStream = mobileDeviceStream
 					.filter(handsetData -> handsetData.getHardware().getBattery().equalsIgnoreCase(searchQuery.getBattery()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getGps())) {
 			logger.info("Running Filter based on getGps..{}",searchQuery.getGps());
-			handsetDataStream = handsetDataStream
+			mobileDeviceStream = mobileDeviceStream
 					.filter(handsetData -> handsetData.getHardware().getGps().equalsIgnoreCase(searchQuery.getGps()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getBrand())) {
 			logger.info("Running Filter based on getBrand..{}",searchQuery.getBrand());
-			handsetDataStream = handsetDataStream
+			mobileDeviceStream = mobileDeviceStream
 					.filter(handsetData -> handsetData.getBrand().equalsIgnoreCase(searchQuery.getBrand()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getPhone())) {
 			logger.info("Running Filter based on getPhone..{}",searchQuery.getPhone());
-			handsetDataStream = handsetDataStream
+			mobileDeviceStream = mobileDeviceStream
 					.filter(handsetData -> handsetData.getPhone().equalsIgnoreCase(searchQuery.getPhone()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getPicture())) {
 			logger.info("Running Filter based on getPicture..{}",searchQuery.getPicture());
-			handsetDataStream = handsetDataStream
+			mobileDeviceStream = mobileDeviceStream
 					.filter(handsetData -> handsetData.getPicture().equalsIgnoreCase(searchQuery.getPicture()));
 		}
 		if (!StringUtils.isEmpty(searchQuery.getResolution())) {
 			logger.info("Running Filter based on getResolution..{}",searchQuery.getResolution());
-			handsetDataStream = handsetDataStream
+			mobileDeviceStream = mobileDeviceStream
 					.filter(handsetData -> handsetData.getResolution().equals(searchQuery.getResolution()));
 		}
-		List<MobileDevice> filteredMobileRecords = handsetDataStream.collect(Collectors.toList());
+		
+		
+		List<MobileDevice> filteredMobileRecords = mobileDeviceStream.collect(Collectors.toList());
 		logger.info("Filter Completed Successfully");
 
 		return filteredMobileRecords;
